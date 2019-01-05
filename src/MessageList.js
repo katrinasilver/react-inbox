@@ -19,39 +19,29 @@ export default class MessageList extends Component {
     this.getMessages()
   }
 
-  handleChecked = (id) => {
-    this.setState({
-      messages: this.state.messages.map(message => {
-        return message.id === id ? {...message, selected: !message.selected } : message
-      })
-    })
-    console.log(this.state.messages);
-  }
-
-  handleStar = (id) => {
-    this.setState({
-      messages: this.state.messages.map(message => {
-        return message.id === id ? { ...message, starred: !message.starred } : message
-      })
-    })
-  }
-
   getMessages = async () => {
     try {
       const response = await axios.get(url)
       this.setState({
         messages: response.data
       })
-      return response.data
-
     } catch (err) {
       console.log(err)
     }
   }
 
-  handleCommands = async (id, command) => {
+  handleChecked = (id) => {
+    this.setState({
+      messages: this.state.messages.map(message => {
+        return message.id === id ? { ...message, selected: !message.selected } : message
+      })
+    })
+    console.log(this.state.messages);
+  }
+
+  handleStar = async (id) => {
     try {
-      await axios.patch(url, { command: command, messageIds: [id]})
+      await axios.patch(url, { command: 'star', messageIds: [id]})
       this.getMessages()
     } catch (err) {
       console.log(err)
@@ -67,7 +57,7 @@ export default class MessageList extends Component {
             <Message
               key={message.id} {...message}
               handleChecked={this.handleChecked}
-              handleCommands={this.handleCommands}
+              handleStar={this.handleStar}
               getMessages={this.getMessages}
             />
           )

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Message = ({read, selected, starred, id, subject, handleChecked, handleCommands}) => {
+const Message = ({read, selected, starred, id, subject, handleChecked, handleStar }) => {
   return (
     <div className={`row message ${read ? "read" : "unread"} ${selected ? "selected" : null}` } data-id={id}>
       <div className="col-xs-1">
@@ -9,7 +9,7 @@ const Message = ({read, selected, starred, id, subject, handleChecked, handleCom
             <input type="checkbox" checked={!!selected} onChange={() => handleChecked(id)} />
           </div>
           <div className="col-xs-2">
-            <i className={`star fa ${starred ? "fa-star" : "fa-star-o"}`} onClick={() => handleCommands(id, 'star')}></i>
+            <i className={`star fa ${starred ? "fa-star" : "fa-star-o"}`} onClick={() => handleStar(id)}></i>
           </div>
         </div>
       </div>
