@@ -40,6 +40,15 @@ export default class MessageList extends Component {
 
   findSelected = () => this.state.messages.filter(message => message.selected).map(message => message.id)
 
+  toggleSelect = () => {
+    let state = this.state.messages.length
+    let local = this.findSelected().length
+
+    return local === state ? "fa-check-square-o"
+      : local < state && local > 0 ? "fa-minus-square-o"
+        : local === 0 ? "fa-square-o" : null
+  }
+
   handleStar = async (id) => {
     try {
       await axios.patch(url, { command: 'star', messageIds: [id]})
@@ -50,19 +59,12 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    if (this.findSelected().length !== this.state.messages.length) {
-      this.setState({
-        messages: this.state.messages.map(message => {
-          return { ...message, selected: true }
-        })
+    let selected = this.findSelected().length !== this.state.messages.length ? true : false
+    this.setState({
+      messages: this.state.messages.map(message => {
+        return { ...message, selected: selected }
       })
-    } else {
-      this.setState({
-        messages: this.state.messages.map(message => {
-          return { ...message, selected: false }
-        })
-      })
-    }
+    })
   }
 
   render() {
@@ -70,6 +72,7 @@ export default class MessageList extends Component {
       <div>
         <Toolbar
           selectAll={this.selectAll}
+          toggleSelect={this.toggleSelect}
         />
         {
           this.state.messages.map(message =>

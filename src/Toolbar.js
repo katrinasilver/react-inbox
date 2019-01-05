@@ -12,7 +12,8 @@ export default class Toolbar extends Component {
           </p>
 
           <button className="btn btn-default">
-            <i className="fa fa-check-square-o" onClick={this.props.selectAll}></i>
+            <i className={`fa ${this.props.toggleSelect()}`}
+              onClick={() => this.props.selectAll()} ></i>
           </button>
 
           <button className="btn btn-default">
