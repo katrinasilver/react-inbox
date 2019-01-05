@@ -36,8 +36,9 @@ export default class MessageList extends Component {
         return message.id === id ? { ...message, selected: !message.selected } : message
       })
     })
-    console.log(this.state.messages);
   }
+
+  findSelected = () => this.state.messages.filter(message => message.selected).map(message => message.id)
 
   handleStar = async (id) => {
     try {
@@ -48,10 +49,28 @@ export default class MessageList extends Component {
     }
   }
 
+  selectAll = () => {
+    if (this.findSelected().length !== this.state.messages.length) {
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return { ...message, selected: true }
+        })
+      })
+    } else {
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return { ...message, selected: false }
+        })
+      })
+    }
+  }
+
   render() {
     return (
       <div>
-        <Toolbar />
+        <Toolbar
+          selectAll={this.selectAll}
+        />
         {
           this.state.messages.map(message =>
             <Message
