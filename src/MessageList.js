@@ -19,12 +19,39 @@ export default class MessageList extends Component {
     this.getMessages()
   }
 
+  stateLength = () => this.state.messages.length
+  filtering = (method) => this.state.messages.filter(message => message[method])
+
+  findIds = () => this.filtering('selected').map(message => message.id)
+  findUnread = () => this.filtering('read').length
+
   getMessages = async () => {
     try {
       const response = await axios.get(url)
       this.setState({
-        messages: response.data
+        messages: response.data.map(messages => {
+          return { ...messages, selected: false } // i know i shouldn't but loading messages for the first time with it selected looks weird
+        })
       })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  handleDelete = async () => {
+    let id = this.findIds()
+    try {
+      await axios.patch(url, { command: 'delete', messageIds: id.length > 1 ? id : [id] })
+      this.getMessages()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  handleStar = async (id) => {
+    try {
+      await axios.patch(url, { command: 'star', messageIds: [id] })
+      this.getMessages()
     } catch (err) {
       console.log(err)
     }
@@ -38,28 +65,17 @@ export default class MessageList extends Component {
     })
   }
 
-  findSelected = () => this.state.messages.filter(message => message.selected).map(message => message.id)
-  findUnread = () => this.state.messages.filter(message => message.read === false).length
+  selectIcons = () => {
+    let state = this.stateLength()
+    let local = this.findIds().length
 
-  toggleSelect = () => {
-    let state = this.state.messages.length
-    let local = this.findSelected().length
     return local === state ? "fa-check-square-o"
       : local < state && local > 0 ? "fa-minus-square-o"
         : local === 0 ? "fa-square-o" : null
   }
 
-  handleStar = async (id) => {
-    try {
-      await axios.patch(url, { command: 'star', messageIds: [id]})
-      this.getMessages()
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
   selectAll = () => {
-    let selected = this.findSelected().length !== this.state.messages.length ? true : false
+    let selected = this.findIds().length !== this.stateLength() ? true : false
     this.setState({
       messages: this.state.messages.map(message => {
         return { ...message, selected: selected }
@@ -72,8 +88,9 @@ export default class MessageList extends Component {
       <div>
         <Toolbar
           selectAll={this.selectAll}
-          toggleSelect={this.toggleSelect}
+          selectIcons={this.selectIcons}
           findUnread={this.findUnread}
+          handleDelete={this.handleDelete}
         />
         {
           this.state.messages.map(message =>

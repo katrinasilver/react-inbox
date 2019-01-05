@@ -11,9 +11,8 @@ export default class Toolbar extends Component {
             unread messages
           </p>
 
-          <button className="btn btn-default">
-            <i className={`fa ${this.props.toggleSelect()}`}
-              onClick={() => this.props.selectAll()} ></i>
+          <button className="btn btn-default" onClick={() => this.props.selectAll()} >
+            <i className={`fa ${this.props.selectIcons()}`} ></i>
           </button>
 
           <button className="btn btn-default">
@@ -38,7 +37,7 @@ export default class Toolbar extends Component {
             <option value="gschool">gschool</option>
           </select>
 
-          <button className="btn btn-default">
+          <button className="btn btn-default" onClick={() => this.props.handleDelete()}>
             <i className="fa fa-trash-o"></i>
           </button>
         </div>
