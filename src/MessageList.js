@@ -11,7 +11,7 @@ export default class MessageList extends Component {
     this.state = {
       messages: [],
       editing: false,
-      viewing: false,
+      viewing: false
     }
   }
 
@@ -39,11 +39,11 @@ export default class MessageList extends Component {
   }
 
   findSelected = () => this.state.messages.filter(message => message.selected).map(message => message.id)
+  findUnread = () => this.state.messages.filter(message => message.read === false).length
 
   toggleSelect = () => {
     let state = this.state.messages.length
     let local = this.findSelected().length
-
     return local === state ? "fa-check-square-o"
       : local < state && local > 0 ? "fa-minus-square-o"
         : local === 0 ? "fa-square-o" : null
@@ -73,6 +73,7 @@ export default class MessageList extends Component {
         <Toolbar
           selectAll={this.selectAll}
           toggleSelect={this.toggleSelect}
+          findUnread={this.findUnread}
         />
         {
           this.state.messages.map(message =>
