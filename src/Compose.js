@@ -1,6 +1,14 @@
 import React, { Component } from 'react'
 
 export default class Compose extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      item: ''
+    }
+  }
+
   render() {
     return (
       <form className="form-horizontal well">

@@ -16,7 +16,7 @@ export default class Toolbar extends Component {
             this.props.showForm()
             }
           }>
-            <i className="fa fa-plus"></i>
+            <i className={`fa ${this.props.composing === false ? "fa-plus" : "fa-minus"}`}></i>
           </a>
 
           <button className="btn btn-default" onClick={() => this.props.selectAll()} disabled={this.props.stateLength() === 0}>

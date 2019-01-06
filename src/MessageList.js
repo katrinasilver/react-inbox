@@ -63,13 +63,6 @@ export default class MessageList extends Component {
     }
   }
 
-  showForm = () => {
-    let { composing } = this.state
-    this.setState({
-      composing: !composing
-    })
-  }
-
   // selected state doesn't persist when you star a message because it's not stored in the data
   handleStar = async (id) => {
     try {
@@ -106,18 +99,25 @@ export default class MessageList extends Component {
     })
   }
 
+  showForm = () => {
+    this.setState({
+      composing: !this.state.composing
+    })
+  }
+
   render() {
     return (
       <div>
         <Toolbar
+          composing={this.state.composing}
           stateLength={this.stateLength}
           findUnread={this.findUnread}
           handleDelete={this.handleDelete}
           handleLabels={this.handleLabels}
           handleRead={this.handleRead}
-          showForm={this.showForm}
           selectIcons={this.selectIcons}
           selectAll={this.selectAll}
+          showForm={this.showForm}
         />
         {
           this.state.composing &&
