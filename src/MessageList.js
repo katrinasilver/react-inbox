@@ -15,9 +15,10 @@ export default class MessageList extends Component {
   }
 
   componentDidMount() { this.getMessages() }
+
   stateLength = () => this.state.messages.length
   findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
-  findUnread = (boolean) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
+  findUnread = (boolean = false) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
 
   getMessages = async () => {
     try {
@@ -44,14 +45,16 @@ export default class MessageList extends Component {
 
   handleDelete = () => this.request('delete')
   handleLabels = (label, type) => this.request(type, 'label', label)
-  handleRead = (value) => {
-    this.request('read', 'read', value)
-  }
+  handleRead = (value) => this.request('read', 'read', value)
 
-  clickRead = async (id) => {
+  clickToggleRead = async (id) => {
     try {
       await axios.patch(url, { command: 'read', messageIds: [id], read: true })
-      this.getMessages()
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return message.id === id ? { ...message, viewing: !message.viewing, selected: false, read: true } : message
+        })
+      })
     } catch (err) {
       console.log(err)
     }
@@ -85,7 +88,7 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    let selected = this.findIds().length !== this.stateLength() ? true : false
+    let selected = this.findIds().length !== this.stateLength() && true
     this.setState({
       messages: this.state.messages.map(message => {
         return { ...message, selected: selected }
@@ -111,7 +114,7 @@ export default class MessageList extends Component {
               key={message.id} {...message}
               handleChecked={this.handleChecked}
               handleStar={this.handleStar}
-              clickRead={this.clickRead}
+              clickToggleRead={this.clickToggleRead}
               getMessages={this.getMessages}
             />
           )
