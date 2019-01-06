@@ -10,33 +10,25 @@ export default class MessageList extends Component {
 
     this.state = {
       messages: [],
-      editing: false,
-      viewing: false
+      editing: false
     }
   }
 
-  componentDidMount() {
-    this.getMessages()
-  }
+  componentDidMount() { this.getMessages() }
 
   stateLength = () => this.state.messages.length
-  filtering = (method) => this.state.messages.filter(message => message[method])
-
-  findIds = () => this.filtering('selected').map(message => message.id)
-  findUnread = () => this.filtering('read').length
+  findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
+  findUnread = () => this.state.messages.reduce((i, message) => message.read === false ?  1 + i : i, 0)
 
   getMessages = async () => {
     try {
       const response = await axios.get(url)
-      // this.setState({
-      //   messages: response.data
-      // })
       this.setState({
         messages: response.data.map(messages => {
-          return { ...messages, selected: false } // there's no request for this
+          return { ...messages, selected: false } // there's no request for this and it looks weird selected on mount
         })
       })
-      console.log(this.state.messages);
+      console.log(this.state.messages)
     } catch (err) {
       console.log(err)
     }
@@ -54,7 +46,7 @@ export default class MessageList extends Component {
 
   handleDelete = () => this.request('delete')
   handleLabels = (label) => this.request('addLabel', 'label', label)
-  handleRead = (value = this.filtering('read') ? false : true) => {
+  handleRead = (value = this.filtering('read') ? true : false) => {
     this.request('read', 'read', value)
   }
 
