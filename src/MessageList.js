@@ -17,7 +17,7 @@ export default class MessageList extends Component {
 
   componentDidMount() { this.getMessages() }
 
-  stateLength = () => this.state.messages.length
+  stateLength = (i = 0) => this.state.messages.length + i
   findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
   findUnread = (boolean = false) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
 
@@ -105,6 +105,16 @@ export default class MessageList extends Component {
     })
   }
 
+  compose = async (message) => {
+    try {
+      await axios.post(url, message)
+      this.showForm()
+      this.getMessages()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   render() {
     return (
       <div>
@@ -121,7 +131,10 @@ export default class MessageList extends Component {
         />
         {
           this.state.composing &&
-          <Compose />
+          <Compose
+            stateLength={this.stateLength}
+            compose={this.compose}
+          />
         }
         {
           this.state.messages.map(message =>
