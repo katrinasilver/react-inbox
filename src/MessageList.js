@@ -28,26 +28,34 @@ export default class MessageList extends Component {
   getMessages = async () => {
     try {
       const response = await axios.get(url)
+      // this.setState({
+      //   messages: response.data
+      // })
       this.setState({
         messages: response.data.map(messages => {
-          return { ...messages, selected: false } // i know i shouldn't but loading messages for the first time with it selected looks weird
+          return { ...messages, selected: false } // there's no request for this
         })
       })
+      console.log(this.state.messages);
     } catch (err) {
       console.log(err)
     }
   }
 
-  handleDelete = async () => {
-    let id = this.findIds()
+  request = async (command, key = null, value = null) => {
+    const id = this.findIds()
     try {
-      await axios.patch(url, { command: 'delete', messageIds: id.length > 1 ? id : [id] })
+      await axios.patch(url, { command: command, messageIds: id.length > 0 ? id : [id], [key] : value })
       this.getMessages()
     } catch (err) {
       console.log(err)
     }
   }
 
+  handleDelete = () => this.request('delete')
+  handleLabels = (label) => this.request('addLabel', 'label', label)
+
+  // selected state doesn't persist when you star a message because it's not stored in the data
   handleStar = async (id) => {
     try {
       await axios.patch(url, { command: 'star', messageIds: [id] })
@@ -56,6 +64,7 @@ export default class MessageList extends Component {
       console.log(err)
     }
   }
+
 
   handleChecked = (id) => {
     this.setState({
