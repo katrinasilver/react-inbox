@@ -15,13 +15,11 @@ export default class MessageList extends Component {
   }
 
   componentDidMount() { this.getMessages() }
-
-  stateLength = () => +this.state.messages.length
+  stateLength = () => this.state.messages.length
   findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
   findUnread = (boolean) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
 
   getMessages = async () => {
-    console.log(this.stateLength())
     try {
       const response = await axios.get(url)
       this.setState({
@@ -29,7 +27,6 @@ export default class MessageList extends Component {
           return { ...messages, selected: false } // there's no request for this and it looks weird selected on mount
         })
       })
-      console.log(this.state.messages)
     } catch (err) {
       console.log(err)
     }
@@ -47,8 +44,17 @@ export default class MessageList extends Component {
 
   handleDelete = () => this.request('delete')
   handleLabels = (label, type) => this.request(type, 'label', label)
-  handleRead = (value = this.filtering('read') ? true : false) => {
+  handleRead = (value) => {
     this.request('read', 'read', value)
+  }
+
+  clickRead = async (id) => {
+    try {
+      await axios.patch(url, { command: 'read', messageIds: [id], read: true })
+      this.getMessages()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   // selected state doesn't persist when you star a message because it's not stored in the data
@@ -105,6 +111,7 @@ export default class MessageList extends Component {
               key={message.id} {...message}
               handleChecked={this.handleChecked}
               handleStar={this.handleStar}
+              clickRead={this.clickRead}
               getMessages={this.getMessages}
             />
           )

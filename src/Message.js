@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Message = ({ read, selected, labels, starred, id, subject, handleChecked, handleStar }) => {
+const Message = ({ read, selected, labels, starred, id, subject, handleChecked, handleStar, clickRead }) => {
   return (
-    <div className={`row message ${read ? "read" : "unread"} ${selected ? "selected" : ""}` } data-id={id}>
+    <div className={`row message ${read ? "read" : "unread"} ${selected ? "selected" : ""}`} data-id={id}>
       <div className="col-xs-1">
         <div className="row">
           <div className="col-xs-2">
@@ -19,7 +19,11 @@ const Message = ({ read, selected, labels, starred, id, subject, handleChecked, 
             <span className="label label-warning" key={label}>{label}</span>
           )
         }
-        <a href="/">
+        <a href="/" onClick={(e) => {
+            e.preventDefault()
+            clickRead(id)
+          }
+        }>
           {subject}
         </a>
       </div>
