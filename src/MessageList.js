@@ -54,6 +54,9 @@ export default class MessageList extends Component {
 
   handleDelete = () => this.request('delete')
   handleLabels = (label) => this.request('addLabel', 'label', label)
+  handleRead = (value = this.filtering('read') ? false : true) => {
+    this.request('read', 'read', value)
+  }
 
   // selected state doesn't persist when you star a message because it's not stored in the data
   handleStar = async (id) => {
@@ -98,6 +101,7 @@ export default class MessageList extends Component {
           selectAll={this.selectAll}
           selectIcons={this.selectIcons}
           findUnread={this.findUnread}
+          handleRead={this.handleRead}
           handleDelete={this.handleDelete}
         />
         {
