@@ -49,10 +49,12 @@ export default class MessageList extends Component {
 
   clickToggleRead = async (id) => {
     try {
+      // only making a separate request to set read to true when a user clicks, better UX
       await axios.patch(url, { command: 'read', messageIds: [id], read: true })
       this.setState({
+        // using already received state data to make toggling possible
         messages: this.state.messages.map(message => {
-          return message.id === id ? { ...message, viewing: !message.viewing, selected: false, read: true } : message
+          return message.id === id ? { ...message, viewing: !message.viewing, selected: false, read: true } : { ...message, selected: false }
         })
       })
     } catch (err) {
