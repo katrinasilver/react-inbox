@@ -19,6 +19,7 @@ export default class MessageList extends Component {
 
   findAll = (method, boolean) => this.state.messages.reduce((i, message) => message[method] === boolean ? 1 + i : i, 0)
   stateLength = (i = 0) => this.state.messages.length + i
+  findId = () => this.state.messages.filter(message => message.selected).map(message => message.id)
   selectedLength = () => this.findAll('selected', true)
   findUnread = () => this.findAll('read', false)
 
@@ -26,8 +27,8 @@ export default class MessageList extends Component {
     try {
       const response = await axios.get(url)
       this.setState({
-        messages: response.data.map(messages => {
-          return { ...messages, selected: !!messages.selected }
+        messages: response.data.map(message => {
+          return { ...message, selected: false }
         })
       })
     } catch (err) {
@@ -36,7 +37,7 @@ export default class MessageList extends Component {
   }
 
   request = async (command, key = null, value = null) => {
-    const id = this.state.messages.filter(message => message.selected).map(message => message.id)
+    const id = this.findId()
     try {
       await axios.patch(url, { command: command, messageIds: id.length > 0 ? id : [id], [key] : value })
       this.getMessages()
@@ -46,8 +47,8 @@ export default class MessageList extends Component {
   }
 
   handleDelete = () => this.request('delete')
-  handleLabels = (label, type) => this.request(type, 'label', label)
   handleRead = (value) => this.request('read', 'read', value)
+  handleLabels = (label, type) => this.request(type, 'label', label)
 
   clickToggleRead = async (id) => {
     try {
@@ -64,11 +65,14 @@ export default class MessageList extends Component {
     }
   }
 
-  // selected state doesn't persist when you star a message because it's not stored in the data
   handleStar = async (id) => {
     try {
       await axios.patch(url, { command: 'star', messageIds: [id] })
-      this.getMessages()
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return message.id === id ? { ...message, viewing: !!message.viewing, starred: !message.starred } : { ...message }
+        })
+      })
     } catch (err) {
       console.log(err)
     }
