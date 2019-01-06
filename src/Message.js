@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Message = ({ read, selected, starred, id, subject, handleChecked, handleStar }) => {
+const Message = ({ read, selected, labels, starred, id, subject, handleChecked, handleStar }) => {
   return (
-    <div className={`row message ${read ? "read" : "unread"} ${selected ? "selected" : null}` } data-id={id}>
+    <div className={`row message ${read ? "read" : "unread"} ${selected ? "selected" : ""}` } data-id={id}>
       <div className="col-xs-1">
         <div className="row">
           <div className="col-xs-2">
@@ -14,9 +14,14 @@ const Message = ({ read, selected, starred, id, subject, handleChecked, handleSt
         </div>
       </div>
       <div className="col-xs-11">
-        <span className="muted-text">
+        {
+          labels.map(label =>
+            <span className="label label-warning" key={label}>{label}</span>
+          )
+        }
+        <a href="/">
           {subject}
-        </span>
+        </a>
       </div>
     </div>
   )

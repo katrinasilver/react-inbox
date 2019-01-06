@@ -16,11 +16,12 @@ export default class MessageList extends Component {
 
   componentDidMount() { this.getMessages() }
 
-  stateLength = () => this.state.messages.length
+  stateLength = () => +this.state.messages.length
   findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
-  findUnread = () => this.state.messages.reduce((i, message) => message.read === false ?  1 + i : i, 0)
+  findUnread = (boolean) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
 
   getMessages = async () => {
+    console.log(this.stateLength())
     try {
       const response = await axios.get(url)
       this.setState({
@@ -45,7 +46,7 @@ export default class MessageList extends Component {
   }
 
   handleDelete = () => this.request('delete')
-  handleLabels = (label) => this.request('addLabel', 'label', label)
+  handleLabels = (label, type) => this.request(type, 'label', label)
   handleRead = (value = this.filtering('read') ? true : false) => {
     this.request('read', 'read', value)
   }
@@ -94,7 +95,9 @@ export default class MessageList extends Component {
           selectIcons={this.selectIcons}
           findUnread={this.findUnread}
           handleRead={this.handleRead}
+          handleLabels={this.handleLabels}
           handleDelete={this.handleDelete}
+          stateLength={this.stateLength}
         />
         {
           this.state.messages.map(message =>
