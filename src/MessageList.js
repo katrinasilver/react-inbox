@@ -54,7 +54,7 @@ export default class MessageList extends Component {
       this.setState({
         // using already received state data to make toggling possible
         messages: this.state.messages.map(message => {
-          return message.id === id ? { ...message, viewing: !message.viewing, selected: false, read: true } : { ...message, selected: false }
+          return message.id === id ? { ...message, viewing: !message.viewing, read: true } : { ...message }
         })
       })
     } catch (err) {
@@ -75,7 +75,7 @@ export default class MessageList extends Component {
   handleChecked = (id) => {
     this.setState({
       messages: this.state.messages.map(message => {
-        return message.id === id ? { ...message, selected: !message.selected } : message
+        return message.id === id ? { ...message, selected: !message.selected } : { ...message }
       })
     })
   }
