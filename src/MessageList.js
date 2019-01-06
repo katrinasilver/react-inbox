@@ -65,7 +65,6 @@ export default class MessageList extends Component {
     }
   }
 
-
   handleChecked = (id) => {
     this.setState({
       messages: this.state.messages.map(message => {
