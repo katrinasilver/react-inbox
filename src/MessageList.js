@@ -17,16 +17,17 @@ export default class MessageList extends Component {
 
   componentDidMount() { this.getMessages() }
 
+  findAll = (method, boolean) => this.state.messages.reduce((i, message) => message[method] === boolean ? 1 + i : i, 0)
   stateLength = (i = 0) => this.state.messages.length + i
-  findIds = () => this.state.messages.filter(message => message.selected).map(message => message.id)
-  findUnread = (boolean = false) => this.state.messages.reduce((i, message) => message.read === boolean ?  1 + i : i, 0)
+  selectedLength = () => this.findAll('selected', true)
+  findUnread = () => this.findAll('read', false)
 
   getMessages = async () => {
     try {
       const response = await axios.get(url)
       this.setState({
         messages: response.data.map(messages => {
-          return { ...messages, selected: false } // there's no request for this and it looks weird selected on mount
+          return { ...messages, selected: !!messages.selected }
         })
       })
     } catch (err) {
@@ -35,7 +36,7 @@ export default class MessageList extends Component {
   }
 
   request = async (command, key = null, value = null) => {
-    const id = this.findIds()
+    const id = this.state.messages.filter(message => message.selected).map(message => message.id)
     try {
       await axios.patch(url, { command: command, messageIds: id.length > 0 ? id : [id], [key] : value })
       this.getMessages()
@@ -83,7 +84,7 @@ export default class MessageList extends Component {
 
   selectIcons = () => {
     let state = this.stateLength()
-    let local = this.findIds().length
+    let local = this.selectedLength('selected', true)
 
     return local === state ? "fa-check-square-o"
       : local < state && local > 0 ? "fa-minus-square-o"
@@ -91,7 +92,7 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    let selected = this.findIds().length !== this.stateLength() && true
+    let selected = this.selectedLength('selected', true) !== this.stateLength() && true
     this.setState({
       messages: this.state.messages.map(message => {
         return { ...message, selected: selected }
@@ -121,6 +122,7 @@ export default class MessageList extends Component {
         <Toolbar
           composing={this.state.composing}
           stateLength={this.stateLength}
+          selectedLength={this.selectedLength}
           findUnread={this.findUnread}
           handleDelete={this.handleDelete}
           handleLabels={this.handleLabels}

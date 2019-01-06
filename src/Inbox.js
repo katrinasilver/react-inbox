@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import MessageList from './MessageList'
 import { FaReact } from 'react-icons/fa'
 
-
 export default class Inbox extends Component {
   render() {
     return (
