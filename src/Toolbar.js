@@ -11,6 +11,14 @@ export default class Toolbar extends Component {
             unread message(s)
           </p>
 
+          <a href="/" className="btn btn-danger" onClick={(e) => {
+            e.preventDefault()
+            this.props.showForm()
+            }
+          }>
+            <i className="fa fa-plus"></i>
+          </a>
+
           <button className="btn btn-default" onClick={() => this.props.selectAll()} disabled={this.props.stateLength() === 0}>
             <i className={`fa ${this.props.selectIcons()}`} ></i>
           </button>

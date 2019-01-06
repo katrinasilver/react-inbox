@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Toolbar from './Toolbar'
 import Message from './Message'
+import Compose from './Compose'
 import axios from 'axios'
 const url = 'http://localhost:8082/api/messages'
 
@@ -10,7 +11,7 @@ export default class MessageList extends Component {
 
     this.state = {
       messages: [],
-      editing: false
+      composing: false
     }
   }
 
@@ -62,6 +63,13 @@ export default class MessageList extends Component {
     }
   }
 
+  showForm = () => {
+    let { composing } = this.state
+    this.setState({
+      composing: !composing
+    })
+  }
+
   // selected state doesn't persist when you star a message because it's not stored in the data
   handleStar = async (id) => {
     try {
@@ -102,22 +110,27 @@ export default class MessageList extends Component {
     return (
       <div>
         <Toolbar
-          selectAll={this.selectAll}
-          selectIcons={this.selectIcons}
-          findUnread={this.findUnread}
-          handleRead={this.handleRead}
-          handleLabels={this.handleLabels}
-          handleDelete={this.handleDelete}
           stateLength={this.stateLength}
+          findUnread={this.findUnread}
+          handleDelete={this.handleDelete}
+          handleLabels={this.handleLabels}
+          handleRead={this.handleRead}
+          showForm={this.showForm}
+          selectIcons={this.selectIcons}
+          selectAll={this.selectAll}
         />
+        {
+          this.state.composing &&
+          <Compose />
+        }
         {
           this.state.messages.map(message =>
             <Message
               key={message.id} {...message}
-              handleChecked={this.handleChecked}
-              handleStar={this.handleStar}
-              clickToggleRead={this.clickToggleRead}
               getMessages={this.getMessages}
+              clickToggleRead={this.clickToggleRead}
+              handleStar={this.handleStar}
+              handleChecked={this.handleChecked}
             />
           )
         }
