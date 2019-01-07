@@ -28,7 +28,7 @@ export default class MessageList extends Component {
       const response = await axios.get(url)
       this.setState({
         messages: response.data.map(message => {
-          return { ...message, selected: false }
+          return { ...message, selected: !!this.state.messages.selected }
         })
       })
     } catch (err) {
@@ -47,7 +47,23 @@ export default class MessageList extends Component {
   }
 
   handleDelete = () => this.request('delete')
-  handleRead = (value) => this.request('read', 'read', value)
+  handleRead = async (value) => {
+    // this.request(type, 'read', label)
+    const id = this.findId()
+    console.log(id);
+
+    try {
+      await axios.patch(url, { command: 'read', messageIds: id.length > 0 ? id : [id], read: value })
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return message.id === id ? { ...message, viewing: !message.viewing, read: !!message.read } : { ...message }
+        })
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   handleLabels = (label, type) => this.request(type, 'label', label)
 
   clickToggleRead = async (id) => {
@@ -146,7 +162,6 @@ export default class MessageList extends Component {
           this.state.messages.map(message =>
             <Message
               key={message.id} {...message}
-              getMessages={this.getMessages}
               clickToggleRead={this.clickToggleRead}
               handleStar={this.handleStar}
               handleChecked={this.handleChecked}

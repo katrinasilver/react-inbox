@@ -3,7 +3,7 @@ import React from 'react'
 const Message = ({ read, viewing, selected, labels, starred, id, subject, body, handleChecked, handleStar, clickToggleRead }) => {
   return (
     <div>
-      <div className={`row message ${read ? "read" : "unread"} ${ selected && "selected" }`} data-id={id}>
+      <div className={`row message ${ read ? "read" : "unread"} ${ selected && "selected" }`} data-id={id}>
         <div className="col-xs-1">
           <div className="row">
             <div className="col-xs-2">
