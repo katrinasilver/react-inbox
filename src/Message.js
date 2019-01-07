@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Message = ({ read, viewing, selected, labels, starred, id, subject, body, handleChecked, handleStar, clickToggleRead }) => {
+const Message = ({ read, viewing, selected, labels, starred, id, subject, body, handleChecked, handleStar, clickToggleRead, selectAll }) => {
   return (
     <div>
       <div className={`row message ${read ? "read" : "unread"} ${ selected && "selected" }`} data-id={id}>

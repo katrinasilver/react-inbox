@@ -11,7 +11,8 @@ export default class MessageList extends Component {
 
     this.state = {
       messages: [],
-      composing: false
+      composing: false,
+      selected: {}
     }
   }
 
@@ -27,9 +28,7 @@ export default class MessageList extends Component {
     try {
       const response = await axios.get(url)
       this.setState({
-        messages: response.data.map(message => {
-          return { ...message, selected: false }
-        })
+        messages: response.data
       })
     } catch (err) {
       console.log(err)
@@ -79,11 +78,27 @@ export default class MessageList extends Component {
   }
 
   handleChecked = (id) => {
-    this.setState({
-      messages: this.state.messages.map(message => {
-        return message.id === id ? { ...message, selected: !message.selected } : { ...message }
-      })
-    })
+    if (this.state.selected.hasOwnProperty.id) {
+      const selected = Object.keys(this.state.selected).reduce((acc, ele) => {
+        if (ele === id) {
+          return { ...acc, [id]: !this.state.selected[id]}
+        }
+        else {
+          return { ...acc, [id]: true }
+        }
+      }, {})
+      this.setState({ selected })
+    }
+    else {
+      const selected = { ...this.state.selected, [id]: !this.state.selected[id] }
+      this.setState({ selected })
+    }
+
+    // this.setState({
+    //   messages: this.state.messages.map(message => {
+    //     return message.id === id ? { ...message, selected: !message.selected } : { ...message }
+    //   })
+    // })
   }
 
   selectIcons = () => {
@@ -96,15 +111,18 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    let selected = this.selectedLength('selected', true) !== this.stateLength() && true
-    this.setState({
-      messages: this.state.messages.map(message => {
-        return { ...message, selected: selected }
+    let selection = this.selectedLength('selected', true) !== this.stateLength() && true
+    if (selection) {
+      this.setState({
+        messages: this.state.messages.map(message => {
+          return { selected: !message.selected }
+        })
       })
-    })
+    }
   }
 
-  showForm = () => {
+  showForm = (e) => {
+    e.preventDefault()
     this.setState({
       composing: !this.state.composing
     })
@@ -118,6 +136,10 @@ export default class MessageList extends Component {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  isSelected = (id) => {
+    return this.state.selected[id] || false
   }
 
   render() {
@@ -145,8 +167,9 @@ export default class MessageList extends Component {
         {
           this.state.messages.map(message =>
             <Message
-              key={message.id} {...message}
-              getMessages={this.getMessages}
+              key={message.id}
+              {...message}
+              selected={this.isSelected(message.id)}
               clickToggleRead={this.clickToggleRead}
               handleStar={this.handleStar}
               handleChecked={this.handleChecked}
