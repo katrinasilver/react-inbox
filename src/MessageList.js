@@ -78,22 +78,16 @@ export default class MessageList extends Component {
   }
 
   handleChecked = (id) => {
-    let selected = {}
     if (this.state.selected.hasOwnProperty.id) {
-      selected = Object.keys(this.state.selected).reduce((acc, ele) => {
+      const selected = Object.keys(this.state.selected).reduce((acc, ele) => {
         return ele === id ? { ...acc, [id]: !this.state.selected[id]} : { ...acc, [id]: true }
       }, {})
+      this.setState({ selected })
     }
     else {
-      selected = { ...this.state.selected, [id]: !this.state.selected[id] }
+      const selected = { ...this.state.selected, [id]: !this.state.selected[id] }
+      this.setState({ selected })
     }
-    this.setState({ selected })
-
-    // this.setState({
-    //   messages: this.state.messages.map(message => {
-    //     return message.id === id ? { ...message, selected: !message.selected } : { ...message }
-    //   })
-    // })
   }
 
   selectIcons = () => {
@@ -106,19 +100,17 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    // let selection = this.selectedLength('selected', true) !== this.stateLength() && true
-    // // if (selection) {
-    //   this.setState({
-    //     messages: this.state.messages.map(message => {
-    //       return {...message, selected: message.selected }
-    //     })
-    //   })
-    // }
-    const selected = Object.keys(this.state.selected).map(ele => {
-      return { ele: true }
-    })
-    console.log({selected})
-    this.setState({ selected: true })
+    let box = Object.keys(this.state.selected).reduce((acc, key) => {
+      return { ...acc, key: this.state.selected[key] }
+    }, {})
+
+    const ids = this.state.messages.map(({ id }) => id)
+    const selected = ids.reduce((acc, ele) => {
+      return { ...acc, [ele]: !this.state.selected[ele] }
+    }, {})
+
+    console.log(ids);
+    this.setState({ selected })
   }
 
   showForm = (e) => {
