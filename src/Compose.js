@@ -11,7 +11,7 @@ export default class Compose extends Component {
   }
 
   makeId = () => {
-    this.uniqueId = this.uniqueId || this.props.stateLength(1)
+    this.uniqueId = this.uniqueId || this.props.messageLength(1)
     return this.uniqueId++
   }
 
