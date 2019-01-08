@@ -11,18 +11,19 @@ export default class MessageList extends Component {
 
     this.state = {
       messages: [],
-      composing: false,
-      selected: {}
+      selected: {},
+      composing: false
     }
   }
 
   componentDidMount() { this.getMessages() }
 
-  findAll = (method, boolean) => this.state.messages.reduce((i, message) => message[method] === boolean ? 1 + i : i, 0)
-  stateLength = (i = 0) => this.state.messages.length + i
-  findId = () => this.state.messages.filter(m => m.selected).map(message => message.id)
-  selectedLength = () => this.findAll('selected', true)
-  findUnread = () => this.findAll('read', false)
+  findUnread = () => this.state.messages.reduce((i, message) => message.read === false ? 1 + i : i, 0)
+  messageLength = (i = 0) => this.state.messages.length + i
+  selectedMessage = () => Object.keys(this.state.selected).filter(id => this.state.selected[id] === true)
+  selectedLength = () => this.selectedMessage().length
+  selectedId = () => Object.keys(this.state.selected).filter(id => this.state.selected[id] === true && id )
+  isSelected = (id) => this.state.selected[id] || false
 
   getMessages = async () => {
     try {
@@ -36,9 +37,9 @@ export default class MessageList extends Component {
   }
 
   request = async (command, key = null, value = null) => {
-    const id = this.findId()
+    const id = this.selectedId()
     try {
-      await axios.patch(url, { command: command, messageIds: id.length > 0 ? id : [id], [key] : value })
+      await axios.patch(url, { command: command, messageIds: id, [key] : value })
       this.getMessages()
     } catch (err) {
       console.log(err)
@@ -51,10 +52,8 @@ export default class MessageList extends Component {
 
   clickToggleRead = async (id) => {
     try {
-      // only making a separate request to set read to true when a user clicks, better UX
       await axios.patch(url, { command: 'read', messageIds: [id], read: true })
       this.setState({
-        // using already received state data to make toggling possible
         messages: this.state.messages.map(message => {
           return message.id === id ? { ...message, viewing: !message.viewing, read: true } : { ...message }
         })
@@ -79,8 +78,8 @@ export default class MessageList extends Component {
 
   handleChecked = (id) => {
     if (this.state.selected.hasOwnProperty.id) {
-      const selected = Object.keys(this.state.selected).reduce((acc, ele) => {
-        return ele === id ? { ...acc, [id]: !this.state.selected[id]} : { ...acc, [id]: true }
+      const selected = Object.keys(this.state.selected).reduce((acc, val) => {
+        return val === id ? { ...acc, [id]: !this.state.selected[id]} : { ...acc, [id]: true }
       }, {})
       this.setState({ selected })
     }
@@ -91,36 +90,24 @@ export default class MessageList extends Component {
   }
 
   selectIcons = () => {
-    let state = this.stateLength()
-    let local = this.selectedLength('selected', true)
+    let state = this.messageLength()
+    let selected = this.selectedLength()
 
-    return local === state ? "fa-check-square-o"
-      : local < state && local > 0 ? "fa-minus-square-o"
-        : local === 0 ? "fa-square-o" : null
+    return selected === state ? "fa-check-square-o"
+      : selected < state && selected > 0 ? "fa-minus-square-o"
+        : selected === 0 && "fa-square-o"
   }
 
   selectAll = () => {
-    // const ids = this.state.messages.map(({ id }) => id)
-    // const selected = ids.reduce((acc, id) => {
-    //   return { ...acc, [id]: !this.state.selected[id] }
-    // }, {})
+    const ids = this.state.messages.map(({ id }) => id)
+    const selected = ids.reduce((acc, id) => ({ ...acc, [id]: true }), {})
 
-    // this.setState({ selected })
-    const selectlength = Object.keys(this.state.selected).filter(id => this.state.selected[id] === true)
-
-    if (selectlength.length === this.stateLength()) {
-      this.setState({
-        selected: {}
-      })
-    } else {
-      this.setState({
-        selected: this.state.selected.forEach(message => selectlength[message.id] = true)
-      })
-    }
+    this.setState({
+      selected: this.selectedLength() === this.messageLength() ? {} : selected
+    })
   }
 
-  showForm = (e) => {
-    e.preventDefault()
+  showForm = () => {
     this.setState({
       composing: !this.state.composing
     })
@@ -129,15 +116,10 @@ export default class MessageList extends Component {
   compose = async (message) => {
     try {
       await axios.post(url, message)
-      this.showForm()
       this.getMessages()
     } catch (err) {
       console.log(err)
     }
-  }
-
-  isSelected = (id) => {
-    return this.state.selected[id] || false
   }
 
   render() {
@@ -145,7 +127,8 @@ export default class MessageList extends Component {
       <div>
         <Toolbar
           composing={this.state.composing}
-          stateLength={this.stateLength}
+          messageLength={this.messageLength}
+          selectedMessage={this.selectedMessage}
           selectedLength={this.selectedLength}
           findUnread={this.findUnread}
           handleDelete={this.handleDelete}
@@ -158,7 +141,7 @@ export default class MessageList extends Component {
         {
           this.state.composing &&
           <Compose
-            stateLength={this.stateLength}
+            messageLength={this.messageLength}
             compose={this.compose}
           />
         }
