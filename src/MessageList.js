@@ -18,7 +18,7 @@ export default class MessageList extends Component {
 
   componentDidMount() { this.getMessages() }
 
-  findUnread = () => this.state.messages.reduce((i, message) => message.read === false ? 1 + i : i, 0)
+  findUnread = () => this.state.messages.reduce((i, message) => message.read === false ? i + 1 : i, 0)
   messageLength = (i = 0) => this.state.messages.length + i
   selectedMessage = () => Object.keys(this.state.selected).filter(id => this.state.selected[id] === true)
   selectedLength = () => this.selectedMessage().length
@@ -47,23 +47,7 @@ export default class MessageList extends Component {
   }
 
   handleDelete = () => this.request('delete')
-  handleRead = async (value) => {
-    // this.request(type, 'read', label)
-    const id = this.findId()
-    console.log(id);
-
-    try {
-      await axios.patch(url, { command: 'read', messageIds: id.length > 0 ? id : [id], read: value })
-      this.setState({
-        messages: this.state.messages.map(message => {
-          return message.id === id ? { ...message, viewing: !message.viewing, read: !!message.read } : { ...message }
-        })
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
+  handleRead = (value) => this.request('read', 'read', value)
   handleLabels = (label, type) => this.request(type, 'label', label)
 
   clickToggleRead = async (id) => {
