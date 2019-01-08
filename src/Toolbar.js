@@ -10,22 +10,15 @@ export default class Toolbar extends Component {
         { id: 4, value: 'personal', disabled: false },
         { id: 5, value: 'gSchool', disabled: false },
       ],
-      defaultValues: [
-        { id: 1, value: 'Add Label', disabled: true },
-        { id: 2, value: 'Remove Label', disabled: true }
-      ]
+      defaultValues: ''
     }
-  }
-
-  setValue = () => {
-    this.setState({
-      value: this.state.labels[0].value
-    })
   }
 
   handleChange = (target, type) => {
     this.props.handleLabels(target, type)
-    this.setValue()
+    this.setState({
+      defaultValue: ''
+    })
   }
 
   render() {
@@ -66,8 +59,8 @@ export default class Toolbar extends Component {
 
           <select className="form-control label-select"
           onChange={(e) => this.handleChange(e.target.value, 'addLabel')}
-          disabled={this.props.selectedLength() === 0}>
-            <option>{this.state.defaultValues[0].value}</option>
+          value={this.state.defaultValue} disabled={this.props.selectedLength() === 0}>
+            <option>Apply Label</option>
             {
               this.state.labels.map(label =>
                 <option key={label.id} disabled={label.disabled}>{label.value}</option>
@@ -77,7 +70,8 @@ export default class Toolbar extends Component {
 
           <select className="form-control label-select"
           onChange={(e) => this.handleChange(e.target.value, 'removeLabel')}
-          disabled={this.props.selectedLength() === 0}>
+          value={this.state.defaultValue} disabled={this.props.selectedLength() === 0}>
+            <option>Remove Label</option>
             {
               this.state.labels.map(label =>
                 <option key={label.id} disabled={label.disabled}>{label.value}</option>
