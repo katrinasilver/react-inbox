@@ -20,7 +20,7 @@ export default class MessageList extends Component {
 
   findAll = (method, boolean) => this.state.messages.reduce((i, message) => message[method] === boolean ? 1 + i : i, 0)
   stateLength = (i = 0) => this.state.messages.length + i
-  findId = () => this.state.messages.filter(message => message.selected).map(message => message.id)
+  findId = () => this.state.messages.filter(m => m.selected).map(message => message.id)
   selectedLength = () => this.findAll('selected', true)
   findUnread = () => this.findAll('read', false)
 
@@ -100,17 +100,23 @@ export default class MessageList extends Component {
   }
 
   selectAll = () => {
-    let box = Object.keys(this.state.selected).reduce((acc, key) => {
-      return { ...acc, key: this.state.selected[key] }
-    }, {})
+    // const ids = this.state.messages.map(({ id }) => id)
+    // const selected = ids.reduce((acc, id) => {
+    //   return { ...acc, [id]: !this.state.selected[id] }
+    // }, {})
 
-    const ids = this.state.messages.map(({ id }) => id)
-    const selected = ids.reduce((acc, ele) => {
-      return { ...acc, [ele]: !this.state.selected[ele] }
-    }, {})
+    // this.setState({ selected })
+    const selectlength = Object.keys(this.state.selected).filter(id => this.state.selected[id] === true)
 
-    console.log(ids);
-    this.setState({ selected })
+    if (selectlength.length === this.stateLength()) {
+      this.setState({
+        selected: {}
+      })
+    } else {
+      this.setState({
+        selected: this.state.selected.forEach(message => selectlength[message.id] = true)
+      })
+    }
   }
 
   showForm = (e) => {
