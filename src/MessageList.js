@@ -3,7 +3,7 @@ import Toolbar from './Toolbar'
 import Message from './Message'
 import Compose from './Compose'
 import axios from 'axios'
-const url = 'http://localhost:8082/api/messages'
+const url = process.env.REACT_APP_BASE_URL
 
 export default class MessageList extends Component {
   constructor(props) {
@@ -79,7 +79,7 @@ export default class MessageList extends Component {
   handleChecked = (id) => {
     if (this.state.selected.hasOwnProperty.id) {
       const selected = Object.keys(this.state.selected).reduce((acc, val) => {
-        return val === id ? { ...acc, [id]: !this.state.selected[id]} : { ...acc, [id]: true }
+        return val === id ? { ...acc, [id]: !this.state.selected[id] } : { ...acc, [id]: true }
       }, {})
       this.setState({ selected })
     }
